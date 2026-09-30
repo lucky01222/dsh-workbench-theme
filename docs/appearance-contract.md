@@ -1,0 +1,62 @@
+# 通用外观协议 v1
+
+颜色和装饰是可选能力。业务插件不引用主题包运行代码，不要求主题插件存在，也不选择某个角色、图片或主题名。
+
+## 共享颜色与控件
+
+优先复用官方 UI Primitives 和 `--dsw-alias-*`、`--dsw-specific-*` 语义变量。主题向官方 ThemeRuntime 注册包含 light/dark 的颜色层，原生 ThemePresenter 统一刷新页面。颜色层的 disposer 只释放自己的层，不撤销其他主题或用户选择的明暗模式。
+
+`--dsw-theme-panel-surface`、`--dsw-theme-sidebar-surface` 等现有工作台变量作为兼容补充；新业务组件以官方语义变量为主。任意第三方硬编码颜色不会自动转换。Shadow DOM 使用浏览器原生的自定义变量继承，避免复制某个主题的色值；iframe 需主动接入通用外观快照，不直接注入任意页面。
+
+## 可选装饰位置
+
+| `data-workbench-surface` | 语义 | 建议的安全空间 |
+| --- | --- | --- |
+| `home-heading` | 首页欢迎区域 | 自有标题旁的空白区域 |
+| `page-heading` | 通用页面标题区 | 标题和工具栏之外 |
+| `page-margin` | 页面外侧留白 | 宽屏且实际留白不少于 122px；不得挤占内容 |
+| `sidebar-footer` | 侧栏底部空白 | 190px；短窗口允许隐藏 |
+| `assistant-header` | 助手顶部装饰带 | 71px；短窗口可降至 48px |
+| `settings-heading` | 设置区域装饰带 | 主题自己的设置区使用 74px |
+| `assistant-empty` | 助手空状态的留白 | 由业务在真实空状态中声明；本版不侵入工作室业务 |
+| `collection-heading` | 资料集合标题旁的留白 | 72×30px；窄容器隐藏，保留标题与控件 |
+| `original-empty` | 原件集合的真实空状态 | 200×142px；保留上传按钮、说明和原有空状态 |
+| `preview-empty` | 原件没有可用在线预览的留白 | 190×142px；保留文件标题、下载与文件信息 |
+
+```html
+<div class="artOutlet" data-workbench-surface="sidebar-footer" aria-hidden="true"></div>
+```
+
+```css
+.artOutlet { display:none }
+.artOutlet[data-workbench-artwork-active] { display:block; height:190px; overflow:hidden }
+```
+
+出口应专用于装饰，默认空且不占空间，不放交互元素。出口的位置和空间由业务布局提供；主题从自身定义中选择构图并用 React Portal 追加内容。`data-workbench-artwork-active` 是主题所有的激活标记，业务只读取它。无主题、无装饰、无匹配角色时均不保留空间。新插入、角色变化、移除、应用切换和停用均受观察器管理，主题卸载清理所有自有门户和标记。装饰不拦截点击。
+
+## 可选的 open Shadow 根
+
+业务可在创建 Shadow DOM 的宿主元素上声明 `data-workbench-surface-root="open"`，并在根与展示出口准备好后从宿主发送一次冒泡的 `workbench:surface-root-ready` 事件。主题后装也会发现已有声明；主题同时监听 document 和每个参与的 open 根，因此嵌套根也兼容已有的仅 `bubbles:true` 事件。事件重发不会重复观察器、CSS 或门户；业务重建根内 HTML 后会重新挂入主题拥有的同一份 CSS。未声明、closed 或已经卸载的根不会被访问。
+
+```js
+host.setAttribute('data-workbench-surface-root', 'open')
+const root = host.attachShadow({ mode: 'open' })
+// 添加业务自己的 HTML、CSS 和空的中性出口。
+host.dispatchEvent(new Event('workbench:surface-root-ready', { bubbles: true }))
+```
+
+主题只在明确的展示出口追加装饰，并在参与的根中拥有一份素材 CSS。私有的 `data-workbench-artwork-*` 宿主标记控制明暗、展示强度和减少动态效果，不覆盖业务本身的外观标记。关闭装饰会撤回 CSS、门户和自有标记；根移除或取消声明时取消对应观察器，主题卸载撤回全部资源并恢复原属性。正文、图谱、文件输入、滚动和草稿均不重挂载。无需业务引用主题包、图片或人物名，也不向主题传输资料。
+
+## 可选品牌槽
+
+导航的 `shell.overlay` 条目声明子槽 `workbench.brand.mark`：single/root，owner 为 `{size, className?}`。没有主题贡献时使用官方 FishLogo fallback。主题通过 `slots.inject()` 在每次槽声明生命周期中注册贡献；后装、停用导航与重新启用无需重装主题，也不争夺宿主父槽所有权。
+
+## 可选标题动效
+
+纯文本标题可声明 `data-workbench-title`。主题保持原文本、字号、位置和无障碍名称，只追加自有 Canvas；有交互子节点、超过 80 字、多行或图形上下文不可用时保留静态标题。动效在 1050ms 内完成，采样点最多 170，画布像素比例最多 1.5；不循环、不阻止输入或页面操作。
+
+标题入口和文字变更按同一观察器管理。减少动态效果、无装饰、触屏、隐藏页面、目标移出窗口或卸载均停止绘制；中断恢复原文字颜色，卸载移除 Canvas、自有类名、监听与属性。颜色变化也会取消当次绘制，下一次从当前配色取色。业务不依赖主题或向主题传送内容；文字只在当前页面中绘制。
+
+## 宿主版本适配
+
+rc.2 的公开 `conversation.hero.brand.mark` 用于首页标志。首页标题及官方 PluginManagerPage 尚无装饰槽，`src/adapters/rc2.mjs` 仅为已核实的结构追加门户与标记，未知结构跳过。原生子节点保留，停用后恢复原文字；不重写会话、输入框、页面操作或业务数据。

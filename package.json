@@ -1,0 +1,50 @@
+{
+  "name": "dsh-workbench-theme",
+  "version": "1.2.0",
+  "description": "Optional shared appearance and Haibara artwork for official DeepSeek Harness",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./client": "./dist/client.js",
+    "./package.json": "./package.json",
+    "./contracts": "./docs/contracts.d.ts",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "files": [
+    "dist",
+    "locale",
+    "docs",
+    "cordis.patch.yml",
+    "README.md",
+    "THIRD_PARTY_NOTICES.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-theme",
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh": "0.1.7-rc.2",
+    "@deepseek-ai/schemastery": "^3.18.2"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node --check src/client.mjs && node --check src/index.mjs && node --check src/artwork-projection.mjs && node --check src/title-motion.mjs && node --check src/appearance-state.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

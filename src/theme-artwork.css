@@ -1,0 +1,31 @@
+/* Haibara display components: the same originals and motifs as the approved library. */
+body[data-workbench-theme]{--art-ground:#d7c4e4;--art-edge:#80688f;--art-ink:#493354;--art-copy:#594265;--foil-x:52%;--figure-x:0px;--figure-y:0px}
+body[data-workbench-theme][data-ds-dark-theme]{--art-ground:#4a3559;--art-edge:#9a82aa;--art-ink:#f2e9f7;--art-copy:#d8c9e4}
+.wb-theme-art{position:relative;isolation:isolate;pointer-events:none;user-select:none;flex:none}
+.wb-theme-art img{display:block;max-width:none}
+.wb-art-lettering,.wb-art-corner-frame>span{position:absolute;font-family:Baskerville,"Times New Roman",serif;font-style:italic;font-weight:600;line-height:.95;color:#fff8ff;letter-spacing:-.04em}
+.wb-art-cutout{height:180px;background:transparent}
+.wb-art-cutout-frame{position:absolute;left:5%;right:8%;top:51px;height:92px;border:1px solid #fdfdff;transform:rotate(-7deg);background:linear-gradient(112deg,#8e939e,#d7dce4 24%,#fff 34%,#bfc4d0 50%,#fafaff 62%,#a6a8b9 85%,#e3e4ed);box-shadow:0 6px 13px #49335422;z-index:1}
+.wb-art-cutout-frame:after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent 0 8px,#34253e09 8px 9px)}
+.wb-art-cutout-figure{position:absolute;right:8px;top:-22px;width:190px;height:202px;overflow:hidden;z-index:3;transform:translate(var(--figure-x),var(--figure-y));transition:transform 220ms ease-out}
+.wb-art-cutout-figure img{position:absolute;height:325px;width:auto;left:50%;top:0;transform:translateX(-50%);filter:drop-shadow(2px 3px 0 #594265) drop-shadow(8px 10px 10px #35223f33)}
+.wb-art-lettering{left:4px;top:16px;z-index:2;font-size:38px;transform:rotate(-6deg);text-shadow:0 1px 1px #5a416626}
+.wb-art-corner{height:178px}
+.wb-art-corner-frame{position:absolute;left:9px;right:26px;top:31px;bottom:13px;border:1px solid var(--art-edge);background:var(--art-ground);transform:rotate(-5deg);box-shadow:0 5px 13px #38274016;overflow:hidden}
+.wb-art-corner-frame:before{content:'';position:absolute;inset:0;background:radial-gradient(#49335412 .7px,transparent .9px);background-size:6px 6px}
+.wb-art-corner-frame:after{content:'';position:absolute;left:-5%;right:-5%;bottom:16px;height:24px;border-block:1px solid #ffffffc9;background:linear-gradient(115deg,#9297a4,#fdfdff 39%,#b9b5c8 70%,#edf0f8);transform:rotate(-9deg)}
+.wb-art-corner-frame>span{left:10px;top:16px;font-size:29px}
+.wb-art-corner-figure{position:absolute;right:-2px;top:0;width:126px;height:178px;overflow:hidden;z-index:2}
+.wb-art-corner-figure img{height:305px;width:auto;position:absolute;top:0;right:-8px;filter:drop-shadow(2px 3px 0 #594265) drop-shadow(7px 8px 9px #35223f2e)}
+.wb-art-silver-calm,.wb-art-silver-sleepy,.wb-art-silver-cheerful,.wb-art-silver-cinema{height:112px}
+.wb-art-foil{position:absolute;inset:9px 10px 8px;border:1px solid #fffffff2;overflow:hidden;transform:rotate(-5deg);background:linear-gradient(112deg,#8e939e 0%,#d7dce4 24%,#fff 34%,#bfc4d0 50%,#fafaff 62%,#a6a8b9 85%,#e3e4ed 100%);background-size:160% 100%;background-position:var(--foil-x) 50%;box-shadow:0 6px 12px #38274021;transition:background-position 220ms ease-out}
+.wb-art-foil>img{width:100%;height:100%;object-fit:cover;object-position:50% 45%;filter:grayscale(1) brightness(1.35) contrast(1.75);opacity:.66;mix-blend-mode:multiply}
+.wb-art-foil:after{content:'';position:absolute;inset:0;background:linear-gradient(112deg,transparent 25%,#ffffffd9 41%,#ffffff20 49%,transparent 59%,#fff9 67%,transparent 71%);background-size:180% 100%;background-position:var(--foil-x) 50%;mix-blend-mode:screen;opacity:.7;transition:background-position 220ms ease-out}
+.wb-art-silver-cheerful .wb-art-foil>img{object-position:50% 35%}
+.wb-art-silver-cinema .wb-art-foil>img{width:560px;height:315px;position:absolute;left:-107px;top:-100px;object-fit:fill;mask-image:linear-gradient(to right,#000 0%,#000 38%,transparent 60%)}
+.wb-art-cinema,.wb-art-drawing{height:160px}
+.wb-art-image-frame{position:absolute;inset:7px 10px;border:1px solid var(--art-edge);overflow:hidden;transform:rotate(-4deg);background:var(--art-ground);box-shadow:0 5px 12px #38274020}
+.wb-art-image-frame>img{width:100%;height:100%;object-fit:cover;object-position:35% 45%}
+.wb-art-cinema .wb-art-image-frame>img{width:540px;height:304px;position:absolute;left:-105px;top:-82px;object-fit:fill}
+.wb-art-drawing .wb-art-image-frame>img{object-position:74% 50%;mix-blend-mode:multiply}
+.wb-art-image-lettering{position:absolute;left:4px;top:0;font:italic 600 31px/1 Baskerville,"Times New Roman",serif;color:#fff;transform:rotate(-5deg);text-shadow:0 2px 4px #34253e25;z-index:2}
