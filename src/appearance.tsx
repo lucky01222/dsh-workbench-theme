@@ -26,7 +26,7 @@ export function installAppearance(ctx) {
   ctx.effect(()=>{
     const names=['data-workbench-theme','data-dsh-theme','data-dsh-theme-scene','data-dsh-theme-strength','data-dsh-reduce-motion']
     const previous=names.map(name=>document.body.getAttribute(name))
-    const sync=()=>{const value=state.getSnapshot().value;document.body.setAttribute('data-workbench-theme','1.1.0');document.body.setAttribute('data-dsh-theme','haibara');document.body.setAttribute('data-dsh-theme-scene',value.scene);document.body.setAttribute('data-dsh-theme-strength',value.strength);document.body.setAttribute('data-dsh-reduce-motion',String(value.reduceMotion))}
+    const sync=()=>{const value=state.getSnapshot().value;document.body.setAttribute('data-workbench-theme','1.3.0');document.body.setAttribute('data-dsh-theme','haibara');document.body.setAttribute('data-dsh-theme-scene',value.scene);document.body.setAttribute('data-dsh-theme-strength',value.strength);document.body.setAttribute('data-dsh-reduce-motion',String(value.reduceMotion))}
     sync();const off=state.subscribe(sync)
     return()=>{off();names.forEach((name,i)=>previous[i]===null?document.body.removeAttribute(name):document.body.setAttribute(name,previous[i]))}
   })
