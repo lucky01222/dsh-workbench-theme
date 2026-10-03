@@ -17,7 +17,9 @@
 body[data-workbench-theme][data-dsh-theme=haibara] [data-workbench-frame] > [class*='_centerCol']{background:var(--dsw-alias-bg-base)}
 body[data-workbench-theme][data-workbench-shell][data-dsh-theme=haibara] [data-slot=sidebar] > [class*='_root']{background:linear-gradient(90deg,var(--wb-rail) 0,var(--wb-rail) 56px,var(--dsw-theme-sidebar-surface) 56px)}
 body[data-workbench-theme][data-dsh-theme=haibara] [data-slot='conversation.header']{background:var(--dsw-theme-header)}
-body[data-workbench-theme][data-dsh-theme=haibara] [data-slot=main] > [class*='_root'],body[data-workbench-theme][data-dsh-theme=haibara] [data-slot=main] [data-phase]{background:var(--dsw-theme-conversation-surface)}
+body[data-workbench-theme][data-dsh-theme=haibara] [data-slot=main] > [class*='_root']{background:var(--dsw-theme-conversation-surface)}
+/* Studio 1.8.4 document chrome uses sidebar/base tokens; scope their surface roles to this bar, including its empty state. */
+body[data-workbench-theme] [data-slot=main] [class*='_documentBar']{background:var(--dsw-theme-application-surface);--dsw-alias-bg-base:var(--dsw-theme-panel-surface);--dsw-alias-border-l3:var(--dsw-alias-border-l2)}
 @media(max-width:680px){.wbAppearanceRow{gap:12px;align-items:flex-start;flex-direction:column}.wbAppearanceRow:has([role=switch]){flex-direction:row;align-items:center}}
 
 body[data-workbench-theme] [data-workbench-frame]{background:var(--dsw-alias-bg-base)}

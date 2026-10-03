@@ -1,6 +1,6 @@
 /* Haibara display components: the same originals and motifs as the approved library. */
-body[data-workbench-theme]{--art-ground:#d7c4e4;--art-edge:#80688f;--art-ink:#493354;--art-copy:#594265;--foil-x:52%;--figure-x:0px;--figure-y:0px}
-body[data-workbench-theme][data-ds-dark-theme]{--art-ground:#4a3559;--art-edge:#9a82aa;--art-ink:#f2e9f7;--art-copy:#d8c9e4}
+body[data-workbench-theme]{--art-ground:#d7c4e4;--art-edge:#80688f;--art-ink:#493354;--art-copy:#594265;--wb-wordmark-ink:#374653;--wb-signature-ink:#8a573f;--foil-x:52%;--figure-x:0px;--figure-y:0px}
+body[data-workbench-theme][data-ds-dark-theme]{--art-ground:#4a3559;--art-edge:#9a82aa;--art-ink:#f2e9f7;--art-copy:#d8c9e4;--wb-wordmark-ink:#dce7ec;--wb-signature-ink:#d8b780}
 .wb-theme-art{position:relative;isolation:isolate;pointer-events:none;user-select:none;flex:none}
 .wb-theme-art img{display:block;max-width:none}
 .wb-art-lettering,.wb-art-corner-frame>span{position:absolute;font-family:Baskerville,"Times New Roman",serif;font-style:italic;font-weight:600;line-height:.95;color:#fff8ff;letter-spacing:-.04em}
@@ -10,6 +10,9 @@ body[data-workbench-theme][data-ds-dark-theme]{--art-ground:#4a3559;--art-edge:#
 .wb-art-cutout-figure{position:absolute;right:8px;top:-22px;width:190px;height:202px;overflow:hidden;z-index:3;transform:translate(var(--figure-x),var(--figure-y));transition:transform 220ms ease-out}
 .wb-art-cutout-figure img{position:absolute;height:325px;width:auto;left:50%;top:0;transform:translateX(-50%);filter:drop-shadow(2px 3px 0 #594265) drop-shadow(8px 10px 10px #35223f33)}
 .wb-art-lettering{left:4px;top:16px;z-index:2;font-size:38px;transform:rotate(-6deg);text-shadow:0 1px 1px #5a416626}
+/* Opaque ink and native text let the same glyph renderer read both script identities. */
+body[data-workbench-theme] .wbBrandWordmark{color:var(--wb-wordmark-ink);font-family:"Workbench Display Serif","Songti SC","STSong",serif;font-size:28px;font-weight:600;font-synthesis:none;letter-spacing:.035em;text-shadow:none}
+@media(max-width:680px){body[data-workbench-theme] .wbBrandWordmark{font-size:clamp(19px,5.4vw,21px);line-height:30px;white-space:nowrap}body[data-workbench-theme] .wbBrandWordmark:lang(en){font-size:clamp(16px,4.8vw,21px);letter-spacing:.015em}}
 .wb-art-corner{height:178px}
 .wb-art-corner-frame{position:absolute;left:9px;right:26px;top:31px;bottom:13px;border:1px solid var(--art-edge);background:var(--art-ground);transform:rotate(-5deg);box-shadow:0 5px 13px #38274016;overflow:hidden}
 .wb-art-corner-frame:before{content:'';position:absolute;inset:0;background:radial-gradient(#49335412 .7px,transparent .9px);background-size:6px 6px}
