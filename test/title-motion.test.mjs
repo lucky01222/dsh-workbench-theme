@@ -115,6 +115,16 @@ test('mode changes remeasure the current ink and selection immediately restores 
  f.calls.length=0;f.move(10);f.tick(1000);assert.ok(f.calls.some(call=>call.type==='fill'&&call.text==='灰'&&call.color==='#f1e9f8'))
  f.select(false);f.handlers.get('selectionchange')();assert.equal(f.title.style.getPropertyValue('color'),'');f.move(30);assert.equal(f.frames.size,0);dispose()
 })
+test('late fonts stay native until loadingdone, and failed readiness checks leave no painted fallback',()=>{
+ const f=fixture();let ready=false,fail=false;const checks=[]
+ f.document.fonts.check=(font,text)=>{checks.push({font,text});if(fail)throw new Error('Font readiness unavailable');return ready}
+ const manager=titleMotion(f),dispose=manager.start(),canvas=f.title.children[0]
+ f.move(10);f.tick(1000);assert.equal(f.frames.size+f.timers.size,0);assert.equal(f.title.style.getPropertyValue('color'),'');assert.equal(canvas.style.getPropertyValue('display'),'');assert.equal(canvas.getAttribute('data-workbench-title-glyphs'),null);assert.equal(f.calls.length,0)
+ assert.deepEqual(checks[0],{font:'normal 600 20px system-ui',text:'灰哀AI'})
+ ready=true;f.fontHandlers.get('loadingdone')();f.move(10);f.tick(1000);assert.equal(states({canvas})[0],'active');assert.equal(f.title.style.getPropertyValue('color'),'transparent')
+ fail=true;f.fontHandlers.get('loadingdone')();f.calls.length=0;f.move(30);f.tick(1000);assert.equal(f.calls.length,0);assert.equal(f.title.style.getPropertyValue('color'),'');assert.equal(canvas.style.getPropertyValue('display'),'');assert.equal(f.frames.size+f.timers.size,0)
+ dispose();assert.equal(f.observers.size+f.fontHandlers.size,0)
+})
 test('an unchanged initial ResizeObserver notification preserves a just-entered glyph',()=>{
  const f=fixture(),a=textAnimator(f.title,f);f.move(10);f.tick(16);const resize=[...f.observers][0]
  resize.fn([{target:f.title}]);assert.equal(states(a)[0],'playing');assert.equal(f.title.style.getPropertyValue('color'),'transparent');assert.equal(f.frames.size,1)

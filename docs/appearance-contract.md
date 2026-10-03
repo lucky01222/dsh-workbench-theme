@@ -59,6 +59,16 @@ host.dispatchEvent(new Event('workbench:surface-root-ready', { bubbles: true }))
 
 文本/字体/布局改变、滚动离屏、失焦、隐藏、减少动态效果、无装饰、触屏与停用时，取消队列与计时器，恢复原文字颜色并重新量测。卸载移除Canvas、自有类名、监听与属性；外部写入的样式优先。标题内容只在当前页面绘制，不向主题Host或外部传送。
 
+首页的 `Ai Haibara` 是既有插兜立绘组件的可选签名动效；只有首页出口传入 `motion="home"`。签名保持单行纯文本和原生斜体字体，文字与其自有祖先不旋转或缩放，避免原生 Range 与 Canvas 的坐标差异；文字阴影关闭，保证进入轮廓状态后没有实心残影。鼠标命中只开放签名文字盒，素材组件及其他图像保持不拦截点击。图库、设置按钮和其他同素材出口不自动启用签名动效。
+
+主标题的 CJK 与普通 Latin 词组使用本地 `Workbench Display Serif`（Noto Serif SC 600）；AI 重音及签名使用 `Workbench Signature`（Cormorant Garamond 600 Italic）字体子集。子集覆盖现有中英文品牌文案，不用于正文；新增或修改字标文案时须同步更新字体子集。支持 CSS Font Loading API 时，字体未就绪或检查失败会保留原生可读字形，加载完成使旧测量失效，字体就绪后才开始轮廓绘制；不具备该 API 的旧环境沿用原生字体与尺寸检测。两个字标使用独立明暗配色，不改变应用的全局品牌色和正文控件字体。
+
 ## 宿主版本适配
 
 rc.2 的公开 `conversation.hero.brand.mark` 用于首页标志。首页标题及官方 PluginManagerPage 尚无装饰槽，`src/adapters/rc2.mjs` 仅为已核实的结构追加门户与标记，未知结构跳过。原生子节点保留，停用后恢复原文字；不重写会话、输入框、页面操作或业务数据。
+
+## 字标排版角色（1.3.1 本地精修）
+
+当前首页字标把中文名称、连接词、AI 和工作台作为连续原文中的显式文字片段；外层是一个具有完整文案 accessible name 的 heading，各片段对辅助技术隐藏以避免重复朗读。中文字形保留 Noto Serif SC 600，AI 采用 Cormorant 真斜体与签名同一暖色重音，连接词略小。各片段分别声明 `data-workbench-title`，已有纯文本逐字 Canvas 算法不改变。任意其他本地化品牌文案保持单段原文，不自动拆解。
+
+`src/typography.css` 是主题自有的角色层：字标、重音、UI、元信息。当前值来自真实样张比较而非通用比例法则；不改全局 body 字体、不覆盖用户正文、Univer canvas 或文档存储样式。字体仍是固定字标子集，签名字体输入更新为 `AI Ai Haibara`，合计 5,048 bytes，新增 I 字形成本52 bytes。未知官方/Shell/Office结构不强制应用具体角色规则。

@@ -1,11 +1,11 @@
-# 工作台主题 v1.3.0
+# 工作台主题 v1.3.2
 
 适用于官方 DeepSeek Harness Web **0.1.7-rc.2**。主题通过官方 `theme.overrideTokens()` 设置共享明暗配色，提供 APTX 标志与可选的小哀展示组件。导航、文档和其他业务插件均可独立安装、启停；主题没有对某个业务插件的必需依赖。
 
 设置 → 通用 → 外观保留原生明暗模式，集中提供展示素材、强度、标志和减少动态效果。“无装饰”关闭人物与分镜，保留配色；停用主题会释放配色层、标志、门户、设置行、观察器与监听器，恢复其他主题或官方默认。
 
 ```sh
-dsh plugin --profile web add /path/to/dsh-workbench-theme-1.3.0.tgz --ignore-scripts
+dsh plugin --profile web add /path/to/dsh-workbench-theme-1.3.2.tgz --ignore-scripts
 dsh web
 ```
 
@@ -32,3 +32,9 @@ npm pack
 资料库通过通用 open Shadow 根声明参与装饰。标题旁使用小幅轻快银箔，原件空状态使用彩稿，无在线预览时使用边角立绘；三个位置保持不同素材和比例。图谱与正文区域保持完整，窄容器隐藏标题分镜。“无装饰”、根移除与主题停用会撤回该根内的 CSS 和门户，业务不需要依赖主题包。
 
 本版同时修正首页输入区被泛化阶段选择器误染的色块，以及文档页签栏混用侧栏/页面/面板颜色的层级。修复局限在主题规则内，停用主题恢复原样，不修改工作室业务或真正侧栏的配色语义。
+
+首页主标题的中文名称与工作台词组使用 Noto Serif SC 600 的宋体字形与墨蓝灰；AI 重音与人物左侧的 `Ai Haibara` 使用 Cormorant Garamond 600 真斜体与暖棕。深色模式对应银白与香槟色。两份字体以固定字标子集随主题打包，页面无需连接外部字体服务；许可和来源见 `docs/fonts` 与 `THIRD_PARTY_NOTICES.md`。两段文字复用同一逐字鼠标效果，签名在窄窗口内也可见，只有文字盒接收鼠标，人物和画框不拦截操作。设置选项与素材图库保持静态，不增加输入框尺寸或首页占用高度。
+
+首页银箔内的两格分镜来自用户此前选用的手机壳照片：侧脸观察与举掌表情。原银框、反光、前景人物和字标动效保留，只在首页出口加入不可交互的局部图片；没有重画表情或引入生成替代。裁切记录见 `docs/artwork/phonecase-panels.sources.json`，使用范围与版权说明见 `THIRD_PARTY_NOTICES.md`。
+
+Client 样式在插入页面前标记官方 Loader 的插件归属；其他插件加载或热更新不能认领和移除本插件的 CSS，自身停用仍释放自己创建的节点。构建后可用 `DSH_RUNTIME_ROOT=/path/to/official-runtime npm run test:client` 运行真实 rc.2 Loader/Cordis 生命周期回归；配对导航／主题需要已有构建产物，可通过 `DSH_PEER_PACKAGE_ROOT` 指定另一独立目录。测试覆盖其他插件热更新、自身启停恢复、旧实例释放及两种加载顺序，使用内存 DOM，不代替浏览器界面验收。

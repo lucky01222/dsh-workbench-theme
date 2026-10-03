@@ -35,6 +35,10 @@ export function textAnimator(node,{document,view,enabled,request,cancel,now,setT
     return true
   }
   function prepare(){
+    if(typeof document.fonts?.check==='function') {
+      const style=view.getComputedStyle(node),font=`${style.fontStyle??'normal'} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`
+      try{if(!document.fonts.check(font,identity)){reset();return false}}catch{reset();return false}
+    }
     if(layout)return true
     if(!valid())return false
     layout=measureGlyphs(node,document,view,sample);if(!layout)return false
