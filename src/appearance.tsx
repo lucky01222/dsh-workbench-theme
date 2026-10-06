@@ -1,6 +1,8 @@
 import { useRef, useState, useSyncExternalStore } from 'react'
 import { FishLogo, Switch } from '@deepseek-ai/dsh-client-ui-primitives'
 import capsule from './assets/aptx-capsule.svg'
+import capsuleSource from './assets/aptx-capsule.svg?raw'
+import { installBrowserBranding } from './browser-branding.mjs'
 import { appearanceState } from './appearance-state.mjs'
 import { artworkProjection, artworkMotion } from './artwork-projection.mjs'
 import { ARTWORK_VARIANTS, ThemeArtwork, ThemePortals } from './theme-artwork'
@@ -13,6 +15,10 @@ import surfaceCSS from './theme-surfaces.css?inline'
 import { shadowArtworkStyles } from './shadow-artwork.mjs'
 import './appearance.css'
 
+// Browser chrome follows the system color scheme independently of page mode.
+// Reuse the same capsule geometry, with the UI mark's pale dark-mode ink.
+const favicon = 'data:image/svg+xml,' + encodeURIComponent(capsuleSource.replace('</svg>', '<style>@media(prefers-color-scheme:dark){[stroke]{stroke:#ebebeb}[fill]:not([fill="none"]){fill:#ebebeb}}</style></svg>'))
+
 /** Native General/Appearance remains the only owner of persisted preferences. */
 export function installAppearance(ctx) {
   const state=appearanceState(ctx.configForms.get('workbench-theme'),ctx.configForms.get('workbench-shell'))
@@ -24,9 +30,14 @@ export function installAppearance(ctx) {
   }))
   const t=ctx.locale.bind('workbenchAppearance')
   ctx.effect(()=>{
+    const branding=installBrowserBranding({document,Observer:MutationObserver,title:()=>t('brandTitle'),icon:()=>state.getSnapshot().value.icon,favicon})
+    const off=state.subscribe(branding.sync),offLocale=ctx.on('locale/change',branding.sync)
+    return()=>{off();offLocale();branding.dispose()}
+  })
+  ctx.effect(()=>{
     const names=['data-workbench-theme','data-dsh-theme','data-dsh-theme-scene','data-dsh-theme-strength','data-dsh-reduce-motion']
     const previous=names.map(name=>document.body.getAttribute(name))
-    const sync=()=>{const value=state.getSnapshot().value;document.body.setAttribute('data-workbench-theme','1.3.2');document.body.setAttribute('data-dsh-theme','haibara');document.body.setAttribute('data-dsh-theme-scene',value.scene);document.body.setAttribute('data-dsh-theme-strength',value.strength);document.body.setAttribute('data-dsh-reduce-motion',String(value.reduceMotion))}
+    const sync=()=>{const value=state.getSnapshot().value;document.body.setAttribute('data-workbench-theme','1.3.3');document.body.setAttribute('data-dsh-theme','haibara');document.body.setAttribute('data-dsh-theme-scene',value.scene);document.body.setAttribute('data-dsh-theme-strength',value.strength);document.body.setAttribute('data-dsh-reduce-motion',String(value.reduceMotion))}
     sync();const off=state.subscribe(sync)
     return()=>{off();names.forEach((name,i)=>previous[i]===null?document.body.removeAttribute(name):document.body.setAttribute(name,previous[i]))}
   })

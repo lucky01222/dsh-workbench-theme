@@ -75,30 +75,40 @@ async function inputs() {
 }
 
 function createDocument() {
-  const styles = []
-  const attributes = new Map()
+  const styles = [], links = [], watchers = new Set(), pending = new Set()
+  const attributes = new Map(), titleNode = {}
+  let title = 'DeepSeek Harness'
   const document = {
-    styles,
+    styles, links,
+    get title() { return title },
+    set title(value) {
+      title = String(value)
+      for (const observer of watchers) if (observer.target === titleNode) pending.add(observer)
+    },
     body: {
       getAttribute: key => attributes.get(key) ?? null,
       setAttribute: (key, value) => attributes.set(key, String(value)),
       removeAttribute: key => attributes.delete(key), dataset: {},
     },
     documentElement: { dataset: {}, hasAttribute: () => false },
-    head: { append: element => styles.push(element) },
+    head: { append: element => (element.tagName === 'LINK' ? links : styles).push(element) },
     createElement(tag) {
-      assert.equal(tag, 'style', 'Only stylesheet effects are exercised by this DOM fixture')
+      assert.ok(['style', 'link'].includes(tag), 'The fixture exercises stylesheet and browser metadata effects')
       const attrs = new Map()
       return {
-        textContent: '',
+        tagName: tag.toUpperCase(), textContent: '',
         setAttribute: (key, value) => attrs.set(key, String(value)),
         getAttribute: key => attrs.get(key) ?? null,
         removeAttribute: key => attrs.delete(key),
-        remove() { const index = styles.indexOf(this); if (index >= 0) styles.splice(index, 1) },
+        remove() {
+          const elements = this.tagName === 'LINK' ? links : styles
+          const index = elements.indexOf(this); if (index >= 0) elements.splice(index, 1)
+        },
       }
     },
-    querySelector: () => null,
+    querySelector: selector => selector === 'title' ? titleNode : null,
     querySelectorAll(selector) {
+      if (selector === 'link[rel~="icon"]') return links.filter(element => element.getAttribute('rel')?.split(/\s+/).includes('icon'))
       if (selector === 'style:not([data-plugin])') return styles.filter(element => element.getAttribute('data-plugin') === null)
       if (selector === 'style[data-plugin]') return styles.filter(element => element.getAttribute('data-plugin') !== null)
       const match = /^style\[data-plugin=(".*")\]$/.exec(selector)
@@ -106,8 +116,43 @@ function createDocument() {
       return []
     },
     addEventListener() {}, removeEventListener() {},
+    Observer: class {
+      constructor(callback) { this.callback = callback }
+      observe(target) { this.target = target; watchers.add(this) }
+      disconnect() { watchers.delete(this); pending.delete(this) }
+      takeRecords() { pending.delete(this); return [] }
+    },
+    flushMutations() {
+      let turns = 0
+      while (pending.size) {
+        assert.ok(turns++ < 20, 'Title observer settles without a feedback loop')
+        const batch = [...pending]; pending.clear()
+        for (const observer of batch) if (watchers.has(observer)) observer.callback([{ type: 'childList', target: titleNode }])
+      }
+    },
+    get titleObserverCount() { return [...watchers].filter(observer => observer.target === titleNode).length },
+  }
+  for (const mode of ['light', 'dark']) {
+    const element = document.createElement('link')
+    for (const [key, value] of Object.entries({ rel: 'icon', href: `/favicon-${mode}.png`, type: 'image/png', sizes: '32x32', media: `(prefers-color-scheme: ${mode})` })) element.setAttribute(key, value)
+    document.head.append(element)
   }
   return document
+}
+
+function assertBrowserBranding(document, active, session = '') {
+  document.flushMutations()
+  assert.equal(document.title, session + (active ? '比护的 AI 工作台' : 'DeepSeek Harness'))
+  assert.equal(document.links.length, 2, 'Branding reuses both host favicon nodes')
+  document.links.forEach((link, index) => {
+    const mode = index === 0 ? 'light' : 'dark'
+    assert.equal(link.getAttribute('media'), `(prefers-color-scheme: ${mode})`)
+    if (active) assert.match(link.getAttribute('href'), /^data:image\/svg\+xml/)
+    else assert.equal(link.getAttribute('href'), `/favicon-${mode}.png`)
+    assert.equal(link.getAttribute('type'), active ? 'image/svg+xml' : 'image/png')
+    assert.equal(link.getAttribute('sizes'), active ? 'any' : '32x32')
+  })
+  assert.equal(document.titleObserverCount, active ? 1 : 0, 'Only the active theme watches the host title')
 }
 
 const syntheticPeer = 'test-style-peer'
@@ -127,7 +172,7 @@ async function createFixture(initialIds, document = createDocument()) {
       __ModuleLoader__: { load: value => { registration = value } },
       matchMedia: () => media, addEventListener() {}, removeEventListener() {},
     },
-    document, MutationObserver: class { observe() {} disconnect() {} },
+    document, MutationObserver: document.Observer,
     console, URL, structuredClone, crypto: webcrypto, clearTimeout, setTimeout, AbortController,
   })
   vm.runInContext(input.official, sandbox, { filename: input.officialPath })
@@ -166,7 +211,8 @@ async function createFixture(initialIds, document = createDocument()) {
   sandbox.window.__ModuleLoader__ = facade
   const ctx = new input.Context()
   ctx.provide('slots', { inject() {} })
-  ctx.provide('locale', { register: () => () => {}, bind: () => key => key })
+  const translations = new Map()
+  ctx.provide('locale', { register: (namespace, value) => { translations.set(namespace, value); return () => translations.delete(namespace) }, bind: namespace => key => translations.get(namespace)?.zh?.[key] ?? key })
   ctx.provide('layout', { panelInfo: { getSnapshot: () => ({ activePanelId: null }), subscribe: () => () => {} } })
   ctx.provide('configForms', { get: () => ({ getSnapshot: () => ({ mode: 'memory', status: 'unavailable' }), subscribe: () => () => {} }) })
   ctx.provide('theme', { overrideTokens: () => () => {} })
@@ -223,7 +269,7 @@ async function createFixture(initialIds, document = createDocument()) {
       return { stage, styles: document.styles.map(element => ({ owner: element.getAttribute('data-plugin'), cssSha256: checksum(element.textContent) })),
         entries: [...ctx.loader.entries()].map(entry => ({ id: entry.options.name, disabled: entry.disabled, state: entry.fiber?.state ?? null })) }
     },
-    async close() { await ctx.fiber.dispose(); await ctx.fiber.await() },
+    async close() { await ctx.fiber.dispose(); await ctx.fiber.await(); document.flushMutations() },
   }
   return fixture
 }
@@ -268,22 +314,29 @@ test('own disable, re-enable and HMR keep peer CSS and leave one own stylesheet'
     const fixture = await createFixture([target.id])
     try {
       await fixture.start()
+      const themeActive = target.id === 'dsh-workbench-theme'
+      assertBrowserBranding(fixture.document, themeActive)
+      fixture.document.title = '测试会话 — DeepSeek Harness'
+      assertBrowserBranding(fixture.document, themeActive, '测试会话 — ')
       await fixture.sync([target.id, syntheticPeer])
       const peer = fixture.singleStyle(syntheticPeer)
       for (let cycle = 1; cycle <= 3; cycle++) {
         const previous = fixture.singleStyle(target.id)
         await fixture.disable(target.id, true)
         stages.push(fixture.snapshot(`disabled-${cycle}`))
+        assertBrowserBranding(fixture.document, false, '测试会话 — ')
         assert.equal(fixture.ownStyles(target.id).length, 0, 'Disabled plugin releases its CSS without removing its module row')
         assert.strictEqual(fixture.singleStyle(syntheticPeer), peer, 'Disabling the target preserves peer CSS')
         assert.ok(!fixture.document.styles.includes(previous))
         await fixture.disable(target.id, false)
         stages.push(fixture.snapshot(`enabled-${cycle}`))
+        assertBrowserBranding(fixture.document, themeActive, '测试会话 — ')
         const current = fixture.singleStyle(target.id)
         assert.notStrictEqual(current, previous)
         assert.strictEqual(fixture.singleStyle(syntheticPeer), peer)
         await fixture.reload(target.id, `r${cycle}`)
         stages.push(fixture.snapshot(`own-HMR-${cycle}`))
+        assertBrowserBranding(fixture.document, themeActive, '测试会话 — ')
         fixture.singleStyle(target.id)
         assert.ok(!fixture.document.styles.includes(current), 'Own HMR releases its old style node')
         assert.strictEqual(fixture.singleStyle(syntheticPeer), peer, 'Own HMR preserves peer CSS')
@@ -291,6 +344,7 @@ test('own disable, re-enable and HMR keep peer CSS and leave one own stylesheet'
       }
     } finally { await fixture.close() }
     assert.equal(fixture.document.styles.length, 0)
+    assertBrowserBranding(fixture.document, false, '测试会话 — ')
   })
 })
 
@@ -331,6 +385,7 @@ for (const order of [['dsh-workbench-shell', 'dsh-workbench-theme'], ['dsh-workb
         const firstCSS = fixture.singleStyle(first)
         await fixture.sync(order)
         stages.push(fixture.snapshot('both-active'))
+        assertBrowserBranding(fixture.document, true)
         assert.strictEqual(fixture.singleStyle(first), firstCSS, 'Loading the second real plugin preserves the first CSS')
         fixture.singleStyle(second)
         // Immediately refresh the later-loaded plugin. Refreshing the first
@@ -341,20 +396,24 @@ for (const order of [['dsh-workbench-shell', 'dsh-workbench-theme'], ['dsh-workb
           const otherStyle = fixture.singleStyle(other)
           await fixture.reload(id, 'coexist-r1')
           stages.push(fixture.snapshot(`HMR-${id}`))
+          assertBrowserBranding(fixture.document, true)
           fixture.singleStyle(id)
           assert.strictEqual(fixture.singleStyle(other), otherStyle, 'Real plugin HMR preserves the other plugin CSS')
           await fixture.disable(id, true)
           stages.push(fixture.snapshot(`disabled-${id}`))
+          assertBrowserBranding(fixture.document, id !== 'dsh-workbench-theme')
           assert.equal(fixture.ownStyles(id).length, 0)
           assert.strictEqual(fixture.singleStyle(other), otherStyle)
           await fixture.disable(id, false)
           stages.push(fixture.snapshot(`enabled-${id}`))
+          assertBrowserBranding(fixture.document, true)
           fixture.singleStyle(id)
           assert.strictEqual(fixture.singleStyle(other), otherStyle)
           assert.equal(fixture.document.styles.length, 2)
         }
       } finally { await fixture.close() }
       assert.equal(fixture.document.styles.length, 0)
+      assertBrowserBranding(fixture.document, false)
     })
   })
 }
