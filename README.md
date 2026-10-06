@@ -1,11 +1,13 @@
-# 工作台主题 v1.3.2
+# 工作台主题 v1.3.3
 
 适用于官方 DeepSeek Harness Web **0.1.7-rc.2**。主题通过官方 `theme.overrideTokens()` 设置共享明暗配色，提供 APTX 标志与可选的小哀展示组件。导航、文档和其他业务插件均可独立安装、启停；主题没有对某个业务插件的必需依赖。
+
+浏览器标签同步显示“比护的 AI 工作台”（英文为 `Bihu AI Workbench`），保留原生会话名称前缀和文档自定义标题。标签图标跟随工作台标志选项，APTX 胶囊按浏览器系统明暗模式显示；选择默认图标或停用主题时恢复原有图标。宿主标题投影绑定官方 Web rc.2 的持久 `<title>` 与产品后缀，升级宿主时需复核。
 
 设置 → 通用 → 外观保留原生明暗模式，集中提供展示素材、强度、标志和减少动态效果。“无装饰”关闭人物与分镜，保留配色；停用主题会释放配色层、标志、门户、设置行、观察器与监听器，恢复其他主题或官方默认。
 
 ```sh
-dsh plugin --profile web add /path/to/dsh-workbench-theme-1.3.2.tgz --ignore-scripts
+dsh plugin --profile web add /path/to/dsh-workbench-theme-1.3.3.tgz --ignore-scripts
 dsh web
 ```
 
