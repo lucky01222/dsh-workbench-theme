@@ -50,6 +50,31 @@ dsh plugin --profile web remove dsh-workbench-theme
 - 停用主题会释放配色层、标志、门户、设置行、观察器与监听器，恢复其他主题或官方默认。
 - Client 样式在插入页面前标记所属插件，其他插件加载或热更新不会误移除本主题的 CSS。
 
+## 制作你自己的角色主题
+
+仓库提供可复用的 [DSH 角色主题制作 Skill](skills/dsh-character-theme/SKILL.md)，指导支持 Agent Skills 的编码助手根据其他角色的素材和视觉风格制作独立主题。它包含角色简报、明暗配色与字标设计、源码改造地图、版本核验、生命周期验证，以及按需制作截图和展示视频的方法。
+
+Skill 本身不包含角色图片，也不会自动安装或切换你的 DSH 主题。新主题需要准备自己的可用素材；代码的 MIT 许可不涵盖现有灰原哀图片。
+
+在 Codex 中首次安装：先下载本仓库，再在仓库根目录执行（已有同名 Skill 时先保留自定义内容）：
+
+```sh
+mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
+cp -R skills/dsh-character-theme "${CODEX_HOME:-$HOME/.codex}/skills/"
+```
+
+在新会话中使用，例如：
+
+```text
+使用 $dsh-character-theme，为我的原创角色“星旅者”制作 DSH 主题。
+我提供了角色立绘和标志，希望使用深蓝与暖金的明暗配色，保留无装饰模式。
+先核对我的 DSH 版本，在独立目录实现新主题，并在隔离环境中验证。
+```
+
+其他支持 Agent Skills 的助手可将同一目录放入其 Skill 发现位置。此 Skill 以主题 1.3.3 / 官方 DSH 0.1.7-rc.2 为已核实参考；其他宿主版本须重新核验。当前架构建议同一 Web Profile 一次只启用一个角色主题，可与导航插件配合。
+
+Skill 通过本仓库的 `skills/` 目录分发，`dsh plugin add dsh-workbench-theme` 只安装主题插件，不会安装这份创作 Skill。
+
 ## 开发
 
 ```sh
