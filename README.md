@@ -15,10 +15,12 @@
 **从漫画分镜，进入你的工作台。** 38 秒横屏短片，展示人物构图、明暗观感、外观设置与无装饰状态。
 
 <!-- theme-video:start -->
-[![观看或下载 38 秒主题展示短片](media/theme-showcase-cover.jpg)](media/theme-showcase.mp4)
+
+https://github.com/user-attachments/assets/4c2d7fb2-486b-4d6d-8fa2-f98550fa897f
+
 <!-- theme-video:end -->
 
-[下载完整 MP4 · 38 秒 · 1080p · 约 6.2 MB](media/theme-showcase.mp4)
+[下载完整 MP4 · 38 秒 · 1080p · 约 6.2 MB](media/theme-showcase.mp4) · [查看封面](media/theme-showcase-cover.jpg)
 
 短片使用真实界面截图与现有主题素材制作；胶囊遮罩、界面分层和镜头转场属于视频后期。主题实际提供的设置与交互见下文。
 
