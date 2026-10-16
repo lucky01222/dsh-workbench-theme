@@ -2,7 +2,7 @@
 
 为你的 AI 工作台换上冷紫与纸白的明暗配色，让小哀的立绘、漫画分镜和字标融进界面。需要专注时，也可以收起装饰。
 
-**dsh-workbench-theme 1.3.3** · 官方 DeepSeek Harness Web **0.1.7-rc.2** · 可独立安装
+**dsh-workbench-theme 1.3.4** · 官方 DeepSeek Harness Web **0.1.7-rc.2 / 0.2.0-rc.2** · 可独立安装
 
 [主题短片](#主题短片) · [功能与画面](#功能与画面) · [快速安装](#快速安装) · [制作其他角色主题](#制作其他角色主题) · [常见问题](#常见问题)
 
@@ -69,10 +69,10 @@ https://github.com/user-attachments/assets/4c2d7fb2-486b-4d6d-8fa2-f98550fa897f
 
 ## 快速安装
 
-需要 **Node.js 24** 和已安装的官方 **DSH 0.1.7-rc.2**。先停止目标 Web Profile，再安装并启动：
+需要 **Node.js 24** 和已安装的官方 **DSH 0.1.7-rc.2 或 0.2.0-rc.2**。先停止目标 Web Profile，再安装并启动：
 
 ```sh
-dsh plugin --profile web add dsh-workbench-theme
+dsh plugin --profile web add https://github.com/lucky01222/dsh-workbench-theme/releases/download/v1.3.4/dsh-workbench-theme-1.3.4.tgz
 dsh web
 ```
 
@@ -85,7 +85,7 @@ dsh web
 用环境变量 `DSH_HOME` 指定目标数据目录。也可安装自己构建的包：
 
 ```sh
-dsh plugin --profile web add /绝对路径/dsh-workbench-theme-1.3.3.tgz
+dsh plugin --profile web add /绝对路径/dsh-workbench-theme-1.3.4.tgz
 ```
 
 ## 和导航一起使用
@@ -152,7 +152,7 @@ dsh plugin --profile web remove dsh-workbench-theme
 
 **支持其他 DSH 版本吗？**
 
-当前仅明确适配官方 Web **0.1.7-rc.2**。升级宿主后需重新核对兼容性。升级或回退主题前，先停止目标 Profile 并备份配置；安装目标版本后，检查首页、插件页、明暗、无装饰以及停用与重新启用。
+当前仅明确适配官方 Web **0.1.7-rc.2 / 0.2.0-rc.2**。升级宿主后需重新核对兼容性。升级或回退主题前，先停止目标 Profile 并备份配置；安装目标版本后，检查首页、插件页、明暗、无装饰以及停用与重新启用。
 
 <details>
 <summary>兼容机制与开发验证</summary>
@@ -178,3 +178,13 @@ npm pack
 代码以 [MIT](LICENSE) 许可发布。**人物、漫画及相关第三方图片不在 MIT 许可范围内**，版权属于原权利方，本仓库不授予再分发或商用许可。README 截图与视频包含这些视觉素材，不改变其权利归属。字体为 SIL OFL 1.1 许可的子集。
 
 来源与加工说明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)、[字体记录](docs/fonts/README.md)及[展示素材说明](media/SOURCES.md)。
+
+## 下载与兼容范围
+
+[预构建安装包与发布记录](https://github.com/lucky01222/dsh-workbench-theme/releases/latest) · [npm](https://www.npmjs.com/package/dsh-workbench-theme)
+
+本版仅声明 0.1.7-rc.2 和 0.2.0-rc.2；alpha 和其他版本未声明支持。上方旧版本截图保留其原版本说明。安装后重启目标 Web Profile。
+
+直接下载 [dsh-workbench-theme-1.3.4.tgz](https://github.com/lucky01222/dsh-workbench-theme/releases/download/v1.3.4/dsh-workbench-theme-1.3.4.tgz)，或使用 npm 包名安装。
+
+以上安装命令固定到本次 GitHub Release；若使用 npm，请先确认包页面已有 `1.3.4`，再安装 `dsh-workbench-theme@1.3.4`。
