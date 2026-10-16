@@ -50,8 +50,10 @@ async function inputs() {
     const official = await readFile(officialPath, 'utf8')
     const harness = JSON.parse(await readFile(resolve(nodeRoot, '@deepseek-ai/dsh/package.json'), 'utf8'))
     const client = JSON.parse(await readFile(resolve(nodeRoot, '@deepseek-ai/dsh-client-modules/package.json'), 'utf8'))
-    assert.equal(harness.version, '0.1.7-rc.2', 'This regression is bound to official Harness 0.1.7-rc.2')
-    assert.equal(client.version, '0.1.7-rc.2', 'This regression requires the matching official Client Modules 0.1.7-rc.2')
+    const expectedVersion = process.env.DSH_EXPECTED_VERSION || '0.1.7-rc.2'
+    assert.ok(['0.1.7-rc.2', '0.2.0-rc.2'].includes(expectedVersion), 'Only explicitly tested hosts are accepted')
+    assert.equal(harness.version, expectedVersion, 'Use the requested official Harness runtime')
+    assert.equal(client.version, expectedVersion, 'Client Modules must match the requested Harness runtime')
     const [{ Context }, { default: Loader }] = await Promise.all([
       import(pathToFileURL(resolve(nodeRoot, '@deepseek-ai/cordis/lib/index.js'))),
       import(pathToFileURL(resolve(nodeRoot, '@deepseek-ai/cordis-plugin-loader/lib/index.js'))),
